@@ -10,29 +10,43 @@ import SwiftUI
 struct CalculatorView: View {
     
     @State var calcNumbers = ""
+    @State var resultCalc = ""
     
     var body: some View {
         
         VStack {
             
-            Text(calcNumbers)
-            
             HStack {
-                ButtonDesign(number: 1, calcNum: $calcNumbers)
-                ButtonDesign(number: 2, calcNum: $calcNumbers)
-                ButtonDesign(number: 3, calcNum: $calcNumbers)
+                Text(calcNumbers)
+                Text(resultCalc)
             }
             
             HStack {
-                ButtonDesign(number: 4, calcNum: $calcNumbers)
-                ButtonDesign(number: 5, calcNum: $calcNumbers)
-                ButtonDesign(number: 6, calcNum: $calcNumbers)
+                ButtonDesign(number: "1", calcNum: $calcNumbers, resultNum: $resultCalc)
+                ButtonDesign(number: "2", calcNum: $calcNumbers, resultNum: $resultCalc)
+                ButtonDesign(number: "3", calcNum: $calcNumbers, resultNum: $resultCalc)
+                ButtonDesign(number: "/", calcNum: $calcNumbers, resultNum: $resultCalc)
             }
             
             HStack {
-                ButtonDesign(number: 7, calcNum: $calcNumbers)
-                ButtonDesign(number: 8, calcNum: $calcNumbers)
-                ButtonDesign(number: 9, calcNum: $calcNumbers)
+                ButtonDesign(number: "4", calcNum: $calcNumbers, resultNum: $resultCalc)
+                ButtonDesign(number: "5", calcNum: $calcNumbers, resultNum: $resultCalc)
+                ButtonDesign(number: "6", calcNum: $calcNumbers, resultNum: $resultCalc)
+                ButtonDesign(number: "*", calcNum: $calcNumbers, resultNum: $resultCalc)
+            }
+            
+            HStack {
+                ButtonDesign(number: "7", calcNum: $calcNumbers, resultNum: $resultCalc)
+                ButtonDesign(number: "8", calcNum: $calcNumbers, resultNum: $resultCalc)
+                ButtonDesign(number: "9", calcNum: $calcNumbers, resultNum: $resultCalc)
+                ButtonDesign(number: "-", calcNum: $calcNumbers, resultNum: $resultCalc)
+            }
+            
+            HStack {
+                ButtonDesign(number: "0", calcNum: $calcNumbers, resultNum: $resultCalc)
+                ButtonDesign(number: "c", calcNum: $calcNumbers, resultNum: $resultCalc)
+                ButtonDesign(number: "=", calcNum: $calcNumbers, resultNum: $resultCalc)
+                ButtonDesign(number: "+", calcNum: $calcNumbers, resultNum: $resultCalc)
             }
         }
     }
@@ -40,15 +54,27 @@ struct CalculatorView: View {
 }
 
 struct ButtonDesign: View {
-    var number:Int
+    var number:String
     
     @Binding var calcNum: String
+    @Binding var resultNum: String
     
     var body: some View {
         
         Button("\(number)") {
-            calcNum = calcNum + "\(number)"
-        }.font(.largeTitle).padding(20)
+            if number == "=" {
+                
+                let expression = NSExpression(format: calcNum)
+                let newExpression = expression.expressionValue(with: nil, context: nil)
+                let textExpression = newExpression as! NSNumber
+                resultNum = "\(textExpression)"
+            } else if number == "c" {
+                calcNum = ""
+                resultNum = ""
+            } else {
+                calcNum = calcNum + "\(number)"
+            }
+        }.font(.largeTitle).frame(width: 55, height: 60)
         
     }
     
