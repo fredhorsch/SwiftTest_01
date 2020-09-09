@@ -84,55 +84,69 @@ class AudioRecorder: NSObject,ObservableObject {
                 
         objectWillChange.send(self)
     }
-}
-
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView(audioRecorder: AudioRecorder())
-    }
-}
-
-
-struct ContentView:View {
     
-    @ObservedObject var audioRecorder: AudioRecorder
-      
-    var body: some View {
-        
-        NavigationView {
-            ZStack {
+    func deleteRecording(urlsToDelete: [URL]) {
             
-                RecordingsList(audioRecorder: audioRecorder)
-            
-                VStack {
-                    Spacer()
-                    
-                    if audioRecorder.recording == false {
-                        Button(action: {self.audioRecorder.startRecording()}) {
-                            Image(systemName: "circle.fill")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 100, height: 100)
-                                .clipped()
-                                .foregroundColor(.red)
-                                .padding(.bottom, 40)
-                    }
-                    } else {
-                        Button(action: {self.audioRecorder.stopRecording()}) {
-                            Image(systemName: "stop.fill")
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 100, height: 100)
-                                .clipped()
-                                .foregroundColor(.red)
-                                .padding(.bottom, 40)
-                        }
-                    }
-                }
+        for url in urlsToDelete {
+            print(url)
+            do {
+               try FileManager.default.removeItem(at: url)
+            } catch {
+                print("File could not be deleted!")
             }
-            .navigationTitle("Voice recorder")
-            .navigationBarItems(trailing: EditButton())
         }
+        
+        fetchRecordings()
     }
 }
+//
+//
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView(audioRecorder: AudioRecorder())
+//    }
+//}
+//
+//
+//struct ContentView:View {
+//
+//    @ObservedObject var audioRecorder: AudioRecorder
+//
+//    var body: some View {
+//
+//        NavigationView {
+//            ZStack {
+//
+//                RecordingsList(audioRecorder: audioRecorder)
+//
+//                VStack {
+//                    Spacer()
+//
+//                    if audioRecorder.recording == false {
+//                        Button(action: {self.audioRecorder.startRecording()}) {
+//                            Image(systemName: "circle.fill")
+//                                .resizable()
+//                                .aspectRatio(contentMode: .fill)
+//                                .frame(width: 100, height: 100)
+//                                .clipped()
+//                                .foregroundColor(.red)
+//                                .padding(.bottom, 40)
+//                    }
+//                    } else {
+//                        Button(action: {self.audioRecorder.stopRecording()}) {
+//                            Image(systemName: "stop.fill")
+//                                .resizable()
+//                                .aspectRatio(contentMode: .fill)
+//                                .frame(width: 100, height: 100)
+//                                .clipped()
+//                                .foregroundColor(.red)
+//                                .padding(.bottom, 40)
+//                        }
+//                    }
+//                }
+//            }
+//            .navigationTitle("Voice recorder")
+//            .navigationBarItems(trailing: EditButton())
+//        }
+//    }
+//}
