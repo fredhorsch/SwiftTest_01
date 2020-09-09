@@ -10,11 +10,18 @@ import SwiftUI
 struct NavBarView:View {
     var body: some View {
         TabView {
+            contentView
+                .tabItem {
+                    Image(systemName: "waveform.circle")
+                    Text("Rec")
+                }
+            
             ListView()
             .tabItem {
                 Image(systemName: "list.bullet")
                 Text("List")
             }
+            
             CalculatorView()
             .tabItem {
                 Image(systemName: "plus.slash.minus")
