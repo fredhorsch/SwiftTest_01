@@ -10,7 +10,7 @@ import SwiftUI
 struct NavBarView:View {
     var body: some View {
         TabView {
-            contentView
+            ContentView(audioRecorder: AudioRecorder())
                 .tabItem {
                     Image(systemName: "waveform.circle")
                     Text("Rec")

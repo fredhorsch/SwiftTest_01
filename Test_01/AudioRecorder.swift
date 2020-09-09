@@ -10,11 +10,18 @@ import SwiftUI
 import Combine
 import AVFoundation
 
-class AudioRecorder: ObservableObject {
+class AudioRecorder: NSObject,ObservableObject {
+    
+    override init() {
+        super.init()
+        fetchRecordings()
+    }
 
     let objectWillChange = PassthroughSubject<AudioRecorder, Never>()
     
     var audioRecorder: AVAudioRecorder!
+    
+    var recordings = [Recording]()
     
     var recording = false {
             didSet {
@@ -57,6 +64,25 @@ class AudioRecorder: ObservableObject {
     func stopRecording() {
         audioRecorder.stop()
         recording = false
+        
+        fetchRecordings()
+    }
+    
+    func fetchRecordings() {
+        recordings.removeAll()
+        
+        let fileManager = FileManager.default
+        let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let directoryContents = try! fileManager.contentsOfDirectory(at: documentDirectory, includingPropertiesForKeys: nil)
+        
+        for audio in directoryContents {
+            let recording = Recording(fileURL: audio, createdAt: getCreationDate(for: audio))
+            recordings.append(recording)
+        }
+        
+        recordings.sort(by: { $0.createdAt.compare($1.createdAt) == .orderedAscending})
+                
+        objectWillChange.send(self)
     }
 }
 
@@ -67,38 +93,46 @@ struct ContentView_Previews: PreviewProvider {
     }
 }
 
-let contentView = ContentView(audioRecorder: AudioRecorder())
 
 struct ContentView:View {
     
     @ObservedObject var audioRecorder: AudioRecorder
       
     var body: some View {
-        VStack {
+        
+        NavigationView {
+            ZStack {
             
-            RecordingsList(audioRecorder: audioRecorder)
+                RecordingsList(audioRecorder: audioRecorder)
             
-            if audioRecorder.recording == false {
-                Button(action: {self.audioRecorder.startRecording()}) {
-                    Image(systemName: "circle.fill")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 100, height: 100)
-                        .clipped()
-                        .foregroundColor(.red)
-                        .padding(.bottom, 40)
-                }
-            } else {
-                Button(action: {self.audioRecorder.stopRecording()}) {
-                    Image(systemName: "stop.fill")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 100, height: 100)
-                        .clipped()
-                        .foregroundColor(.red)
-                        .padding(.bottom, 40)
+                VStack {
+                    Spacer()
+                    
+                    if audioRecorder.recording == false {
+                        Button(action: {self.audioRecorder.startRecording()}) {
+                            Image(systemName: "circle.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 100, height: 100)
+                                .clipped()
+                                .foregroundColor(.red)
+                                .padding(.bottom, 40)
+                    }
+                    } else {
+                        Button(action: {self.audioRecorder.stopRecording()}) {
+                            Image(systemName: "stop.fill")
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 100, height: 100)
+                                .clipped()
+                                .foregroundColor(.red)
+                                .padding(.bottom, 40)
+                        }
+                    }
                 }
             }
+            .navigationTitle("Voice recorder")
+            .navigationBarItems(trailing: EditButton())
         }
     }
 }
